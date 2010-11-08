@@ -70,6 +70,10 @@ Files: vendor/gems/haml
 Copyright: (c) 2006-2009 Hampton Catlin, Nathan Weizenbaum, and Chris Eppstein
 License: MIT
 
+Files: vendor/gems/maruku
+Copyright: (c) 2006 Andrea Censi <andrea@rubyforge.org>
+License: GPL
+
 Files: vendor/gems/mislav-will_paginate
 Copyright: (c) 2007 PJ Hyett and Mislav Marohnić
 License: MIT
@@ -101,3 +105,15 @@ License: MIT
 Files: vendor/rails
 Copyright: (c) 2004-2009 David Heinemeier Hansson <david@loudthinking.com>
 License: MIT
+
+Files: public/javascripts/jquery*
+Copyright: (c) 2010 http://jqueryui.com/about
+License: MIT
+
+Files: public/images/icons/*.png
+Copyright: (c) 2010 Mark James http://www.famfamfam.com/lab/icons/silk/
+License: Creative Commons Attribution 2.5 License
+
+Files: lib/progress_bar.rb
+Copyright: (c) 2001-2005 Satoru Takabayashi <satoru@namazu.org>
+License: GPL

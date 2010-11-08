@@ -28,6 +28,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resource :status, :member => {:overview => :get}
 
   map.release_notes '/release_notes', :controller => :pages, :action => :release_notes
+  map.credits '/credits', :controller => :pages, :action => :credits
 
   map.root :controller => :pages, :action => :home
 

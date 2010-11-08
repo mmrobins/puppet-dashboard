@@ -11,4 +11,7 @@ class PagesController < ApplicationController
 
   def release_notes
   end
+
+  def credits
+  end
 end
