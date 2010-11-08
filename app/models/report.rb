@@ -30,7 +30,7 @@ class Report < ActiveRecord::Base
   end
 
   def status
-    failed? ? 'failure' : 'success'
+    failed? ? 'failure' : changed? ? 'success' : 'unchanged'
   end
 
   def metrics
