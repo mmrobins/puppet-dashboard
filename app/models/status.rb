@@ -21,7 +21,7 @@ class Status
   end
 
   # Default time in seconds for the interval
-  INTERVAL_CUTOFF = 30.days
+  INTERVAL_CUTOFF = 300.days
 
   # Returns an array of Statuses by date for either a :node, or :nodes or all nodes in the system.
   #
@@ -47,12 +47,14 @@ class Status
 
     sql = <<-SQL
       SELECT
-        COUNT(*) - SUM(success)       as failed,
+        (select count(*) from reports where status = "changed")   as changed,
+        (select count(*) from reports where status = "unchanged") as unchanged,
+        (select count(*) from reports where status = "failed")   as failed,
         COUNT(*)                      as total,
-        SUM(success) / COUNT(*) * 100 as percent,
         #{date}                       as start
       FROM reports
     SQL
+        #SUM(success) / COUNT(*) * 100 as percent,
 
     sql << "WHERE " if has_where
     sql << "time >= \"#{options[:start].to_s(:db)}\"\n" if options[:start]

@@ -12,7 +12,7 @@ describe Report do
         Time.stubs(:now).returns(@now)
         @node = Node.generate
         @report_yaml = File.read(File.join(RAILS_ROOT, "spec/fixtures/sample_report.yml"))
-        @report_data = YAML.load(@report_yaml).extend(ReportExtensions).extend(ReportExtensions)
+        @report_data = YAML.load(@report_yaml).extend(ReportExtensions)
       end
 
       it "handles greater than 64k of report text without truncating" do

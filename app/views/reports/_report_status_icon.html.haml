@@ -1,5 +1,5 @@
 %span{:title => report ? report_title_text(report) : 'No reports'}
   - if report
-    = icon(report.status.to_sym)
+    = icon(report.status)
   - else
     = icon(:error)

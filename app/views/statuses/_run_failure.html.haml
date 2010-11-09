@@ -18,6 +18,9 @@
       %tr.succeeded
         - statuses.each do |status|
           %td= status.total - status.failed
+      %tr.changed
+        - statuses.each do |status|
+          %td= status.total - status.failed
       %tr.failed
         - statuses.each do |status|
           %td= status.failed
