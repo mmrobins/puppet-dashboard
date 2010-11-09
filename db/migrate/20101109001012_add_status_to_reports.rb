@@ -13,18 +13,27 @@ class AddStatusToReports < ActiveRecord::Migration
   def self.up
     add_column :reports, :status, :string
     add_index :reports, [:time, :node_id, :status]
-    Report.all.each do |report|
+    require "#{RAILS_ROOT}/lib/progress_bar"
+    reports = Report.all
+    pbar = ProgressBar.new("Migrating Reports:", reports.size, STDOUT)
+    reports.each do |report|
       report.status = report.failed? ? 'failed' : report.changed? ? 'changed' : 'unchanged'
+      pbar.inc
       report.save
     end
+    pbar.finish
     remove_index :reports, [:time, :node_id, :success]
     remove_column :reports, :success
 
     add_column :nodes, :status, :string
-    Node.all.each do |node|
+    nodes = Node.all
+    pbar = ProgressBar.new("Migrating Nodes:", nodes.size, STDOUT)
+    nodes.each do |node|
       node.status = node.last_report ? node.last_report.status : 'unchanged'
+      pbar.inc
       node.save
     end
+    pbar.finish
     remove_column :nodes, :success
   end
 

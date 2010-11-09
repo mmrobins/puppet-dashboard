@@ -33,8 +33,6 @@ class Node < ActiveRecord::Base
   fires :updated, :on => :update
   fires :removed, :on => :destroy
 
-  # RH:TODO: Denormalize last report status into nodes table.
-
   # Return nodes based on their currentness and successfulness.
   #
   # The terms are:
@@ -166,7 +164,7 @@ class Node < ActiveRecord::Base
     unless self.last_report == report
       self.last_report = report
       self.reported_at = report ? report.time : nil
-      self.success = report ? report.success? : false
+      self.status = report ? report.status? : 'unchanged'
 
       # FIXME #update_without_callbacks doesn't update the object, and #save! is creating unwanted timeline events.
       ### node.send :update_without_callbacks # do not create a timeline event

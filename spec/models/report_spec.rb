@@ -26,16 +26,16 @@ describe Report do
         report.report.logs.first.message.length.should == original_report_length
       end
 
-      it "sets success correctly based on whether the report contains failures" do
+      it "sets status correctly based on whether the report contains failures" do
         report = report_model_from_yaml('failure.yml')
         report.save!
-        Report.find(report.id).should_not be_success
+        Report.find(report.id).status.should == 'failed'
       end
 
       it "should properly create a valid report" do
         report = report_model_from_yaml('success.yml')
         report.save!
-        Report.find(report.id).should be_success
+        Report.find(report.id).status.should == 'unchanged'
       end
 
       it "should consider a blank report to be invalid" do
@@ -146,13 +146,13 @@ describe Report do
       @newer_report = Report.generate_for(@node, Time.now, false)
       @node.last_report.should == @newer_report
       @node.reported_at.should == @newer_report.time
-      @node.success.should == @newer_report.success
+      @node.status.should == @newer_report.status
 
       @newer_report.destroy
 
       @node.last_report.should == @report
       @node.reported_at.should == @report.time
-      @node.success.should == @report.success
+      @node.status.should == @report.status
     end
 
     it "should clear the node's most recent report if there are no other reports" do
@@ -160,7 +160,7 @@ describe Report do
 
       @node.last_report.should == nil
       @node.reported_at.should == nil
-      @node.success.should == false
+      @node.status.should == 'unchanged'
     end
   end
 end

@@ -68,7 +68,7 @@ class Report < ActiveRecord::Base
   end
 
   def set_attributes
-    self.status = failed? ? 'failed' : changed? ? 'success' : 'unchanged'
+    self.status = failed? ? 'failed' : changed? ? 'changed' : 'unchanged'
     self.time   = report.time
     self.host   = report.host
   end
