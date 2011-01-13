@@ -8,7 +8,11 @@ class ResourceStatus < ActiveRecord::Base
   serialize :tags, Array
 
   named_scope :inspections, { :joins => :report, :conditions => "reports.kind = 'inspect'" }
-  named_scope :on_latest_inspections, { :joins => :node, :conditions => "reports.kind = 'inspect' and nodes.last_inspect_report_id = reports.id" }
+
+  named_scope :latest_inspections, {
+    :joins      => "INNER JOIN reports ON resource_statuses.report_id = reports.id INNER JOIN nodes on reports.id = nodes.last_inspect_report_id",
+    :conditions => "reports.kind = 'inspect' and reports.id = nodes.last_inspect_report_id"
+  }
 
   named_scope :by_file_content, lambda {|content|
     {
