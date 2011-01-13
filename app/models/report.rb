@@ -113,9 +113,7 @@ class Report < ActiveRecord::Base
   end
 
   def update_node
-    if kind == "apply" && (node.reported_at.nil? || (node.reported_at-1.second) <= self.time)
-      node.assign_last_report(self)
-    end
+    node.possibly_assign_last_report(self)
   end
 
   def long_name
@@ -150,6 +148,6 @@ class Report < ActiveRecord::Base
   end
 
   def replace_last_report
-    node.assign_last_report if node
+    node.find_and_assign_last_report(kind) if node
   end
 end

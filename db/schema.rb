@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110113183616) do
+ActiveRecord::Schema.define(:version => 20110113013807) do
 
   create_table "metrics", :force => true do |t|
     t.integer "report_id",                                :null => false
@@ -69,8 +69,9 @@ ActiveRecord::Schema.define(:version => 20110113183616) do
     t.datetime "reported_at"
     t.integer  "last_report_id"
     t.string   "status"
-    t.boolean  "hidden",             :default => false
+    t.boolean  "hidden",                 :default => false
     t.integer  "baseline_report_id"
+    t.integer  "last_inspect_report_id"
   end
 
   create_table "old_reports", :force => true do |t|

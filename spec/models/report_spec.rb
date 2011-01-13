@@ -560,4 +560,22 @@ HEREDOC
       Metric.count.should == 0
     end
   end
+
+  describe "setting denormalized fields on node" do
+    ["apply", "inspect"].each do |kind|
+      describe "from a #{kind} report" do
+        describe "when creating the first report" do
+          node   = Node.generate(:name => "my_node")
+          report = Report.generate(:host => "my_node", :time => Time.now, :kind => kind)
+        end
+
+        describe "when creating a subsequent report"
+        describe "when creating a prior report"
+        describe "when deleting the latest report"
+        describe "when deleting the only report"
+        describe "when deleting some historical report"
+      end
+    end
+  end
+
 end

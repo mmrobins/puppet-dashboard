@@ -15,6 +15,7 @@ class Node < ActiveRecord::Base
 
   has_many :reports, :dependent => :destroy
   belongs_to :last_report, :class_name => 'Report'
+  belongs_to :last_inspect_report, :class_name => 'Report'
   belongs_to :baseline_report, :class_name => 'Report'
 
   named_scope :with_last_report, :include => :last_report
@@ -138,18 +139,42 @@ class Node < ActiveRecord::Base
     return false
   end
 
-  # Assigns the node's :last_report attribute. # FIXME
-  def assign_last_report(report=nil)
-    report ||= Report.applies.find_last_for(self)
+  def possibly_assign_last_report(report, force = false)
+    case report.kind
+    when "apply"
+      if force or reported_at.nil? or reported_at.to_i < report.time.to_i
+        self.last_report = report
+        self.reported_at = report.time
+        self.status = report.status
+        self.save!
+      end
+    when "inspect"
+      if force or ! self.last_inspect_report or self.last_inspect_report.time.to_i < report.time.to_i
+        self.last_inspect_report = report
+        self.save!
+      end
+    end
+  end
 
-    if self.last_report != report
-      self.last_report = report
-      self.reported_at = report ? report.time : nil
-      self.status = report ? report.status : 'unchanged'
-
-      # FIXME #update_without_callbacks doesn't update the object, and #save! is creating unwanted timeline events.
-      ### node.send :update_without_callbacks # do not create a timeline event
-      self.save!
+  def find_and_assign_last_report(kind)
+    if kind == "apply"
+      report = Report.applies.find_last_for(self)
+    else
+      report = Report.inspections.find_last_for(self)
+    end
+    if report
+      possibly_assign_last_report(report, true)
+    else
+      case kind
+      when "apply"
+        self.last_report = nil
+        self.reported_at = nil
+        self.status = 'unchanged'
+        self.save!
+      when "inspect"
+        self.last_inspect_report = nil
+        self.save!
+      end
     end
   end
 
