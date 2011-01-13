@@ -113,7 +113,14 @@ class Report < ActiveRecord::Base
   end
 
   def update_node
-    node.possibly_assign_last_report(self)
+    case kind
+    when "apply"
+      node.assign_last_apply_report_if_newer(self)
+    when "inspect"
+      node.assign_last_inspect_report_if_newer(self)
+    else
+      raise "There's no such thing as a #{kind.inspect} report"
+    end
   end
 
   def long_name
@@ -148,6 +155,15 @@ class Report < ActiveRecord::Base
   end
 
   def replace_last_report
-    node.find_and_assign_last_report(kind) if node
+    return unless node
+
+    case kind
+    when "apply"
+      node.find_and_assign_last_apply_report
+    when "inspect"
+      node.find_and_assign_last_inspect_report
+    else
+      raise "There's no such thing as a #{kind.inspect} report"
+    end
   end
 end

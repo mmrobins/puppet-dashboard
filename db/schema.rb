@@ -76,7 +76,7 @@ ActiveRecord::Schema.define(:version => 20110113013807) do
 
   create_table "old_reports", :force => true do |t|
     t.integer  "node_id"
-    t.text     "report",     :limit => 2147483647
+    t.text     "report",     :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "host"

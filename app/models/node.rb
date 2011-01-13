@@ -139,42 +139,46 @@ class Node < ActiveRecord::Base
     return false
   end
 
-  def possibly_assign_last_report(report, force = false)
-    case report.kind
-    when "apply"
-      if force or reported_at.nil? or reported_at.to_i < report.time.to_i
-        self.last_report = report
-        self.reported_at = report.time
-        self.status = report.status
-        self.save!
-      end
-    when "inspect"
-      if force or ! self.last_inspect_report or self.last_inspect_report.time.to_i < report.time.to_i
-        self.last_inspect_report = report
-        self.save!
-      end
+  def assign_last_apply_report_if_newer(report)
+    raise "wrong report type" unless report.kind == "apply"
+
+    if reported_at.nil? or reported_at.to_i < report.time.to_i
+      self.last_report = report
+      self.reported_at = report.time
+      self.status = report.status
+      self.save!
     end
   end
 
-  def find_and_assign_last_report(kind)
-    if kind == "apply"
-      report = Report.applies.find_last_for(self)
-    else
-      report = Report.inspections.find_last_for(self)
+  def assign_last_inspect_report_if_newer(report)
+    raise "wrong report type" unless report.kind == "inspect"
+
+    if ! self.last_inspect_report or self.last_inspect_report.time.to_i < report.time.to_i
+      self.last_inspect_report = report
+      self.save!
     end
+  end
+
+  def find_and_assign_last_apply_report
+    report = Report.applies.find_last_for(self)
     if report
-      possibly_assign_last_report(report, true)
+      self.reported_at = nil
+      assign_last_apply_report_if_newer(report)
     else
-      case kind
-      when "apply"
-        self.last_report = nil
-        self.reported_at = nil
-        self.status = 'unchanged'
-        self.save!
-      when "inspect"
-        self.last_inspect_report = nil
-        self.save!
-      end
+      self.last_report = nil
+      self.reported_at = nil
+      self.status = 'unchanged'
+      self.save!
+    end
+  end
+
+  def find_and_assign_last_inspect_report
+    report = Report.inspections.find_last_for(self)
+    self.last_inspect_report = nil
+    if report
+      assign_last_apply_report_if_newer(report)
+    else
+      self.save!
     end
   end
 

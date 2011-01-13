@@ -328,6 +328,7 @@ HEREDOC
       Time.zone = 'UTC'
       @node = Node.generate(:name => 'sample_node')
       @report_yaml = File.read(File.join(RAILS_ROOT, "spec/fixtures/reports/puppet25/1_changed_0_failures.yml"))
+      Report.count.should == 0
       Report.create_from_yaml(@report_yaml)
       Report.count.should == 1
       report = Report.first
