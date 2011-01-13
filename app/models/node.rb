@@ -14,11 +14,11 @@ class Node < ActiveRecord::Base
   has_many :node_groups, :through => :node_group_memberships
 
   has_many :reports, :dependent => :destroy
-  belongs_to :last_report, :class_name => 'Report'
+  belongs_to :last_apply_report, :class_name => 'Report'
   belongs_to :last_inspect_report, :class_name => 'Report'
   belongs_to :baseline_report, :class_name => 'Report'
 
-  named_scope :with_last_report, :include => :last_report
+  named_scope :with_last_report, :include => :last_apply_report
   named_scope :by_report_date, :order => 'reported_at DESC'
 
   named_scope :search, lambda{|q| q.blank? ? {} : {:conditions => ['name LIKE ?', "%#{q}%"]} }
@@ -105,8 +105,8 @@ class Node < ActiveRecord::Base
   end
 
   def status_class
-    return 'no reports' unless last_report
-    last_report.status
+    return 'no reports' unless last_apply_report
+    last_apply_report.status
   end
 
   attr_accessor :node_class_names
@@ -143,7 +143,7 @@ class Node < ActiveRecord::Base
     raise "wrong report type" unless report.kind == "apply"
 
     if reported_at.nil? or reported_at.to_i < report.time.to_i
-      self.last_report = report
+      self.last_apply_report = report
       self.reported_at = report.time
       self.status = report.status
       self.save!
@@ -165,7 +165,7 @@ class Node < ActiveRecord::Base
       self.reported_at = nil
       assign_last_apply_report_if_newer(report)
     else
-      self.last_report = nil
+      self.last_apply_report = nil
       self.reported_at = nil
       self.status = 'unchanged'
       self.save!

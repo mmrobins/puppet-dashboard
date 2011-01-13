@@ -67,14 +67,14 @@ describe Report do
       node = Node.generate!
       report = Report.create!(:host => node.name, :time => Time.now, :kind => "apply")
       node.reload
-      node.last_report.should == report
+      node.last_apply_report.should == report
     end
 
     it "should not update the node's last report for inspect reports" do
       node = Node.generate
       report = Report.create!(:host => node.name, :time => Time.now, :kind => "inspect")
       node.reload
-      node.last_report.should_not == report
+      node.last_apply_report.should_not == report
     end
   end
 
@@ -121,14 +121,14 @@ describe Report do
       # so time matches what the node has
       @newer_report.reload
       @node.reload
-      @node.last_report.should == @newer_report
+      @node.last_apply_report.should == @newer_report
       @node.reported_at.should == @newer_report.time
       @node.status.should == @newer_report.status
 
       @newer_report.destroy
       @node.reload
 
-      @node.last_report.should == @report
+      @node.last_apply_report.should == @report
       @node.reported_at.should == @report.time
       @node.status.should == @report.status
     end
@@ -142,14 +142,14 @@ describe Report do
       # so time matches what the node has
       @newer_report.reload
       @node.reload
-      @node.last_report.should == @newer_report
+      @node.last_apply_report.should == @newer_report
       @node.reported_at.should == @newer_report.time
       @node.status.should == @newer_report.status
 
       @newer_report.destroy
       @node.reload
 
-      @node.last_report.should == @report
+      @node.last_apply_report.should == @report
       @node.reported_at.should == @report.time
       @node.status.should == @report.status
     end
@@ -158,7 +158,7 @@ describe Report do
       @report.destroy
       @node.reload
 
-      @node.last_report.should == nil
+      @node.last_apply_report.should == nil
       @node.reported_at.should == nil
       @node.status.should == 'unchanged'
     end
@@ -563,20 +563,61 @@ HEREDOC
   end
 
   describe "setting denormalized fields on node" do
+    before :each do
+      @node = Node.generate(:name => "my_node")
+    end
+
     ["apply", "inspect"].each do |kind|
+
       describe "from a #{kind} report" do
+
         describe "when creating the first report" do
-          it "should" do
-            node   = Node.generate(:name => "my_node")
+          it "should set the last_#{kind}_report to the report" do
             report = Report.generate(:host => "my_node", :time => Time.now, :kind => kind)
+
+            @node.reload
+            @node.send("last_#{kind}_report").should == report
+          end
+
+          if kind == "apply"
+            it "should set the reported_at time to the report's time"
           end
         end
 
-        describe "when creating a subsequent report"
-        describe "when creating a prior report"
-        describe "when deleting the latest report"
-        describe "when deleting the only report"
-        describe "when deleting some historical report"
+        describe "when creating a subsequent report" do
+          it "should set the last_#{kind}_report to the report"
+
+          if kind == "apply"
+            it "should set the reported_at time to the report's time"
+          end
+        end
+
+        describe "when creating a prior report" do
+          it "should not change any of last_apply_report, last_inspect_report, or reported_at"
+        end
+
+        describe "when deleting the latest report" do
+          it "should set the last_#{kind}_report to the next most recent report"
+
+          if kind == "apply"
+            it "should set the reported_at time to the next most recent report's time"
+            it "should set the node status to the next most recent report's status"
+          end
+        end
+
+        describe "when deleting the only report" do
+          it "should set the last_#{kind}_report to nil"
+
+          if kind == "apply"
+            it "should set the reported_at time to nil"
+            it "should set the node status to nil"
+          end
+        end
+
+        describe "when deleting some historical report" do
+          it "should not change any of last_apply_report, last_inspect_report, or reported_at"
+        end
+
       end
     end
   end
