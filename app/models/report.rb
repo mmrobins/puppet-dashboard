@@ -21,10 +21,6 @@ class Report < ActiveRecord::Base
   named_scope :applies,     :conditions => {:kind => "apply"  }, :include => :metrics
   named_scope :baselines,   :include => :node, :conditions => ['nodes.baseline_report_id = reports.id']
 
-  def self.find_last_for(node)
-    self.first(:conditions => {:node_id => node.id}, :order => 'time DESC', :limit => 1)
-  end
-
   def total_resources
     metric_value("resources", "total")
   end
@@ -155,6 +151,7 @@ class Report < ActiveRecord::Base
   end
 
   def replace_last_report
+    #require 'ruby-debug'; debugger; true #DEBUG!
     return unless node
 
     case kind

@@ -48,7 +48,7 @@ class Node < ActiveRecord::Base
   named_scope :by_currentness_and_successfulness, lambda {|currentness, successfulness|
     operator = successfulness ? '!=' : '='
     if currentness
-      { :conditions => ["nodes.status #{operator} 'failed' AND nodes.last_report_id is not NULL"]  }
+      { :conditions => ["nodes.status #{operator} 'failed' AND nodes.last_apply_report_id is not NULL"]  }
     else
       {
         :conditions => ["reports.kind = 'apply' AND reports.status #{operator} 'failed'"],
@@ -160,23 +160,23 @@ class Node < ActiveRecord::Base
   end
 
   def find_and_assign_last_apply_report
-    report = Report.applies.find_last_for(self)
+    report = self.reports.applies.first
     if report
       self.reported_at = nil
       assign_last_apply_report_if_newer(report)
     else
       self.last_apply_report = nil
       self.reported_at = nil
-      self.status = 'unchanged'
+      self.status = nil
       self.save!
     end
   end
 
   def find_and_assign_last_inspect_report
-    report = Report.inspections.find_last_for(self)
+    report = self.reports.inspections.first
     self.last_inspect_report = nil
     if report
-      assign_last_apply_report_if_newer(report)
+      assign_last_inspect_report_if_newer(report)
     else
       self.save!
     end
