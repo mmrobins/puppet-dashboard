@@ -566,8 +566,10 @@ HEREDOC
     ["apply", "inspect"].each do |kind|
       describe "from a #{kind} report" do
         describe "when creating the first report" do
-          node   = Node.generate(:name => "my_node")
-          report = Report.generate(:host => "my_node", :time => Time.now, :kind => kind)
+          it "should" do
+            node   = Node.generate(:name => "my_node")
+            report = Report.generate(:host => "my_node", :time => Time.now, :kind => kind)
+          end
         end
 
         describe "when creating a subsequent report"
