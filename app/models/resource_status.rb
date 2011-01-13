@@ -1,5 +1,6 @@
 class ResourceStatus < ActiveRecord::Base
   belongs_to :report
+  has_one :node, :through => :report
   has_many :events, :class_name => "ResourceEvent", :dependent => :destroy
 
   accepts_nested_attributes_for :events
@@ -7,6 +8,7 @@ class ResourceStatus < ActiveRecord::Base
   serialize :tags, Array
 
   named_scope :inspections, { :joins => :report, :conditions => "reports.kind = 'inspect'" }
+  named_scope :on_latest_inspections, { :joins => :node, :conditions => "reports.kind = 'inspect' and nodes.last_inspect_report_id = reports.id" }
 
   named_scope :by_file_content, lambda {|content|
     {

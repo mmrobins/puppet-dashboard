@@ -151,7 +151,6 @@ class Report < ActiveRecord::Base
   end
 
   def replace_last_report
-    #require 'ruby-debug'; debugger; true #DEBUG!
     return unless node
 
     case kind
