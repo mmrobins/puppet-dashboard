@@ -4,4 +4,17 @@ class NodeGroupsController < InheritedResources::Base
   before_filter :raise_if_enable_read_only_mode, :only => [:new, :edit, :create, :update, :destroy]
 
   include SearchableIndex
+
+  def diff_latest_against_own_baselines
+    @node_group = NodeGroup.find(params[:id])
+
+    @diff = {}
+    @node_group.nodes.each do |node|
+      next unless node.baseline_report && node.last_inspect_report
+      d = node.baseline_report.diff(node.last_inspect_report)
+      @diff.merge! d
+    end
+
+    @diff
+  end
 end
