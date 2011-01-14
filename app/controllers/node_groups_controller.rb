@@ -8,13 +8,10 @@ class NodeGroupsController < InheritedResources::Base
   def diff_latest_against_own_baselines
     @node_group = NodeGroup.find(params[:id])
 
-    @diff = {}
+    @node_diffs = {}
     @node_group.nodes.each do |node|
       next unless node.baseline_report && node.last_inspect_report
-      d = node.baseline_report.diff(node.last_inspect_report)
-      @diff.merge! d
+      @node_diffs[node.name] = node.baseline_report.diff(node.last_inspect_report)
     end
-
-    @diff
   end
 end

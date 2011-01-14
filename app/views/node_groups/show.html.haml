@@ -39,7 +39,11 @@
       .section
         = render 'statuses/run_failure', :nodes => @node_group.all_nodes
     .section
-      %h3 Nodes for this group
+      .left.column
+        %h3 Nodes for this group
+      .right.column
+        = link_to "Diffs against own baselines", diff_latest_against_own_baselines_node_group_path, :class => 'button'
+    .section
       - if @node_group.all_nodes.present?
         = render 'nodes/nodes', :nodes => @node_group.all_nodes, :container => @node_group
       - else
