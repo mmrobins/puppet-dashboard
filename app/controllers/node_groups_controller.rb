@@ -12,7 +12,7 @@ class NodeGroupsController < InheritedResources::Base
     @nodes_without_baselines = []
     @nodes_without_differences = []
     @nodes_with_differences = []
-    @node_group.nodes.each do |node|
+    @node_group.all_nodes.each do |node|
       @nodes_without_latest_inspect_reports << node and next unless node.last_inspect_report
       @nodes_without_baselines << node and next unless node.baseline_report
 

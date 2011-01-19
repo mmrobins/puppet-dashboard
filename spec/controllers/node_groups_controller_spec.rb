@@ -118,6 +118,10 @@ describe NodeGroupsController do
           :report_diff         => {"File[/tmp/test]"=>{:content=>["{md5}abcd", "{md5}efgh"]}}
         }]
       end
+      
+      it "should handle child node groups" do
+        raise 'hell'
+      end
     end
   end
 end
