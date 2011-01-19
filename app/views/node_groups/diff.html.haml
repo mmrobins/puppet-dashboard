@@ -1,0 +1,20 @@
+#sidebar= render 'shared/node_manager_sidebar'
+#main
+  .header
+    %h2 Latest inspect report differences from the node's baseline
+  .item
+    %h3 The following nodes don't have a latest inspect report
+    = @nodes_without_latest_inspect_reports.map {|node| link_to node.name, node_path(node)}.join(", ")
+  .item
+    %h3 The following nodes don't have a baseline
+    = @nodes_without_baselines.map {|node| link_to node.name, node_path(node)}.join(", ")
+  .item
+    %h3 The following nodes didn't have any difference from their baseline:
+    = @nodes_without_differences.map {|node| link_to node.name, node_path(node)}.join(", ")
+  .item
+    - @nodes_with_differences.each do |diff_information|
+      = render 'reports/diff',                                        |
+        :baseline_report   => diff_information[:baseline_report],     |
+        :my_report         => diff_information[:last_inspect_report], |
+        :resource_statuses => diff_information[:resource_statuses],   |
+        :diff              => diff_information[:report_diff]

@@ -4,10 +4,10 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :node_groups,
-    :member     => { :diff_latest_against_own_baselines => :get },
-    :collection => {:search => :get} do |groups|
+    :member     => { :diff  => :get },
+    :collection => {:search => :get } do |groups|
       groups.resources :nodes, :requirements => {:id => /.*/}
-  end
+    end
 
   map.resources :nodes,
     :member => {
