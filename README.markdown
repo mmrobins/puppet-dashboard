@@ -24,6 +24,7 @@ The Puppet Dashboard will run on most Unix, Linux and Mac OS X systems once its 
 * [MySQL](http://www.mysql.com/downloads/mysql/) database server 5.x
 * [Ruby-MySQL](http://rubygems.org/gems/mysql) bindings 2.7.x or 2.8.x
 * [Rubygems](http://rubygems.org/) package manager to easily install Ruby libraries
+* [JSON Gem](http://flori.github.com/json/) JSON library gem
 
 ### Operating system-specific examples for installing dependencies
 
@@ -127,6 +128,10 @@ Installation
     2.  For developing the software using the `development` and `test` environments:
 
             rake db:migrate db:test:prepare
+
+5.  Install the `json` gem
+
+        gem install json
 
 Ownership and permission requirements
 -------------------------------------
