@@ -33,7 +33,15 @@ class Report < ActiveRecord::Base
   end
 
   def skipped_resources
-    metric_value("resources", "skipped_resources")
+    metric_value("resources", "skipped")
+  end
+
+  def pending_resources
+    metric_value("resources", "pending")
+  end
+
+  def unchanged_resources
+    metric_value("resources", "unchanged")
   end
 
   def changed_resources
@@ -71,6 +79,32 @@ class Report < ActiveRecord::Base
     attribute_hash
   end
 
+  # In order to add data to the report or its dependent tables
+  def self.munge_report_hash(report_hash)
+    report = report_hash.dup
+    report['resource_statuses'].each do |rs|
+      event_statuses = rs['events'].map {|e| e['status']}.flatten
+
+      resource_status_status = if event_statuses.include? 'failure'
+        'failed'
+      elsif event_statuses.include? 'noop'
+        'pending'
+      elsif event_statuses.include? 'success'
+        'changed'
+      else
+        'unchanged'
+      end
+
+      rs.merge!({'status' => resource_status_status})
+    end
+
+    report['metrics']['resources'].merge!({
+      'pending'   => report['resource_statuses'].count {|rs| rs['status'] == 'pending'  },
+      'unchanged' => report['resource_statuses'].count {|rs| rs['status'] == 'unchanged'}
+    })
+    report
+  end
+
   def self.create_from_yaml(report_yaml)
     raw_report = YAML.load(report_yaml)
 
@@ -83,7 +117,7 @@ class Report < ActiveRecord::Base
 
     report_hash["resource_statuses"] = report_hash["resource_statuses"].values
 
-    Report.create!(Report.attribute_hash_from(report_hash))
+    Report.create!(Report.attribute_hash_from(Report.munge_report_hash(report_hash)))
   end
 
   def assign_to_node

@@ -79,33 +79,64 @@ describe Report do
   end
 
   describe "metrics methods" do
-    before :each do
-      @report_yaml = File.read(File.join(RAILS_ROOT, "spec/fixtures/reports/puppet26/report_ok_service_started_ok.yaml"))
-      @report = Report.create_from_yaml(@report_yaml)
+    let :report_yaml do
+      File.read(File.join(RAILS_ROOT, "spec/fixtures/reports/puppet26/resource_status_test.yaml"))
+    end
+    let :report do
+      Report.create_from_yaml(report_yaml)
     end
 
     it "should get the correct value for total_resources" do
-      @report.total_resources.should == 9
+      report.total_resources.should == 14
     end
 
     it "should get the correct value for failed_resources" do
-      @report.failed_resources.should == 0
+      report.failed_resources.should == 1
     end
 
     it "should get the correct value for failed_restarts" do
-      @report.failed_restarts.should == 0
+      report.failed_restarts.should == 0
     end
 
     it "should get the correct value for skipped_resources" do
-      @report.skipped_resources.should == 0
+      report.skipped_resources.should == 1
     end
 
     it "should get the correct value for changed_resources" do
-      @report.changed_resources.should == 2
+      report.changed_resources.should == 1
     end
 
     it "should get the correct value for total_time" do
-      @report.total_time.should == '1.82'
+      report.total_time.should == '0.13'
+    end
+
+    describe "calculated after the transformation in munge" do
+      it "should correctly populate the 'status' of resource_statuses" do
+        report.resource_statuses.map {|rs| [rs.title, rs.status]}.should =~ [
+          ["puppet"                            ,  'unchanged'],
+          ["monthly"                           ,  'unchanged'],
+          ["never"                             ,  'unchanged'],
+          ["weekly"                            ,  'unchanged'],
+          ["puppet"                            ,  'unchanged'],
+          ["hourly"                            ,  'unchanged'],
+          ["/tmp/audit"                        ,  'unchanged'],
+          ["daily"                             ,  'unchanged'],
+          ["/tmp/noop_without_pending_changes" ,  'unchanged'],
+          ["/tmp/compliant_without_changes"    ,  'unchanged'],
+          ["/tmp/skipped"                      ,  'unchanged'],
+          ["/tmp/noop_with_pending_changes"    ,  'pending'  ],
+          ["/tmp/compliant_with_changes"       ,  'changed'  ],
+          ["/etc/failure"                      ,  'failed'   ]
+        ]
+      end
+
+      it "should get the correct value for pending_resources" do
+        report.pending_resources.should == 1
+      end
+
+      it "should get the correct value for unchanged_resources" do
+        report.unchanged_resources.should == 11
+      end
     end
   end
 
@@ -113,9 +144,9 @@ describe Report do
     it "should populate report related tables from a version 0 yaml report" do
       Time.zone = 'UTC'
       @node = Node.generate(:name => 'sample_node')
-      @report_yaml = File.read(File.join(RAILS_ROOT, "spec/fixtures/reports/puppet25/1_changed_0_failures.yml"))
+      report_yaml = File.read(File.join(RAILS_ROOT, "spec/fixtures/reports/puppet25/1_changed_0_failures.yml"))
       Report.count.should == 0
-      Report.create_from_yaml(@report_yaml)
+      Report.create_from_yaml(report_yaml)
       Report.count.should == 1
       report = Report.first
       report.node.should == @node
@@ -130,6 +161,8 @@ describe Report do
         ['resources', 'restarted'        ,  '0.00'],
         ['resources', 'failed_restarts'  ,  '0.00'],
         ['resources', 'failed'           ,  '0.00'],
+        ['resources', 'pending'          ,  '0.00'],
+        ['resources', 'unchanged'        ,  '0.00'],
         ['resources', 'total'            ,  '3.00'],
         ['changes',   'total'            ,  '1.00'],
       ]
@@ -173,6 +206,8 @@ describe Report do
           ['time',      'total'            ,  '1.82'],
           ['resources', 'total'            ,  '9.00'],
           ['resources', 'changed'          ,  '2.00'],
+          ['resources', 'unchanged'        ,  '7.00'],
+          ['resources', 'pending'          ,  '0.00'],
           ['resources', 'out_of_sync'      ,  '2.00'],
           ['changes',   'total'            ,  '2.00'],
           ['events',    'total'            ,  '2.00'],
@@ -254,6 +289,8 @@ describe Report do
         ['resources', 'total'            , '12.00'],
         ['resources', 'out_of_sync'      ,  '4.00'],
         ['resources', 'changed'          ,  '3.00'],
+        ['resources', 'pending'          ,  '1.00'],
+        ['resources', 'unchanged'        ,  '8.00'],
         ['changes',   'total'            ,  '3.00'],
         ['events',    'total'            ,  '4.00'],
         ['events',    'success'          ,  '3.00'],
