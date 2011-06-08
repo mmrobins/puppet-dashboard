@@ -15,7 +15,8 @@ class Status
   # * :node  => Node to return Statuses for.
   # * :nodes => Nodes to return Statuses for.
   def self.within_daily_run_history(options={})
-    return [] if options[:nodes] && options[:nodes].empty?
+    #require 'ruby-debug';debugger;1
+    #return [] if options[:nodes] && options[:nodes].empty?
 
     last_day = Time.zone.now + 1.day             # Last full day to include (ignores time).
     limit    = SETTINGS.daily_run_history_length # Limit the number of days to return (includes "last_day").

@@ -12,20 +12,8 @@ class NodesController < InheritedResources::Base
     scoped_index :unhidden
   end
 
-  def successful
-    redirect_to nodes_path(:current => true.to_s, :successful => true.to_s)
-  end
-
-  def failed
-    redirect_to nodes_path(:current => true.to_s, :successful => false.to_s)
-  end
-
-  def unreported
-    scoped_index :unhidden, :unreported
-  end
-
-  def no_longer_reporting
-    scoped_index :unhidden, :no_longer_reporting
+  [:unreported, :failed, :unresponsive, :pending, :changed, :unchanged].each do |action|
+    define_method(action) {scoped_index :unhidden, action}
   end
 
   def hidden
@@ -115,9 +103,6 @@ class NodesController < InheritedResources::Base
       end
       scope_names.each do |scope_name|
         scope = scope.send(scope_name)
-      end
-      if params[:current].present? or params[:successful].present?
-        scope = scope.by_currentness_and_successfulness(params[:current] == "true", params[:successful] == "true")
       end
       set_collection_ivar(scope.with_last_report.by_report_date)
 
