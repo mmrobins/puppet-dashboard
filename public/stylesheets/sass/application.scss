@@ -590,62 +590,6 @@ body {
     }
   }
 
-  &.pages_home_action {
-    table.node_summary {
-      border: solid 1px #DDD;
-      padding: 1em;
-      width: 75%;
-      margin: 0 auto;
-
-      tr {
-        &.unresponsive { @include node_summary_row(gray)   }
-        &.failed       { @include node_summary_row(red)    }
-        &.pending      { @include node_summary_row(orange) }
-        &.changed      { @include node_summary_row(green)  }
-        &.unchanged    { @include node_summary_row(darkblue)  }
-        &.total        { @include node_summary_row(black)  }
-
-        td {
-          padding-bottom: 1em;
-
-          &.count {
-            padding-right: 1em;
-            width: 1em;
-            text-align: right;
-
-            span {
-              font-size: 3em;
-              font-weight: bold;
-            }
-          }
-
-          .label {
-            font-size: 1.5em;
-          }
-
-          em {
-            color: #888;
-            margin-left: 10px;
-            font-size: 1.25em;
-          }
-
-          hr {
-            height: 5px;
-            align: left;
-            border: 0;
-            margin: 0;
-          }
-        }
-
-        &.total td {
-          padding-top: 1em;
-          padding-bottom: 0;
-          border-top: solid 1px #DDD;
-        }
-      }
-    }
-  }
-
   &.pages_release_notes_action {
     .markeddown {
         h2 {

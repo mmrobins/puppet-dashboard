@@ -50,7 +50,6 @@ class Node < ActiveRecord::Base
     }}
   end
 
-  named_scope :reported,   :conditions => ["reported_at IS NOT NULL"]
   named_scope :unreported, :conditions => {:reported_at => nil}
 
   named_scope :hidden, :conditions => {:hidden => true}

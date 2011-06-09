@@ -5,6 +5,10 @@
 %table.main
   %thead
     %tr
+      %th(colspan="3")
+      %th(colspan="5")
+        Resources
+    %tr
       %th.status
       %th.hostname
         Hostname
@@ -12,6 +16,16 @@
         %th Source
       %th.latest_report.desc
         &darr; Latest report
+      %th
+        All
+      %th
+        Failed
+      %th
+        Pending
+      %th
+        Changed
+      %th
+        Unchanged
   %tbody
     - if nodes.present?
       - nodes.sort {|a,b| (b.reported_at || Time.at(0)) <=> (a.reported_at || Time.at(0))}.each do |node|
@@ -30,11 +44,13 @@
                 = sources.map{|s| link_to(s.name,s)}.join(", ")
           %td.latest_report
             = node.last_apply_report ? node.last_apply_report.time : "Has not reported"
+          - ["total", "failed", "pending", "changed", "unchanged"].each do |status|
+            %td
+              = node.last_apply_report.metric_value("resources", status).to_i
     - else
-      %td.empty{:colspan => container.nil? ? 3 : 4}
+      %td.empty{:colspan => container.nil? ? 8 : 9}
         = describe_no_matches_for :nodes
-  - if nodes.present?
-    %tfoot
-      %tr
-        %td{:colspan => container.nil? ? 3 : 4 }
-          = pagination_for nodes, more_link
+  %tfoot
+    %tr
+      %td{:colspan => container.nil? ? 8 : 9 }
+        = pagination_for nodes, more_link
