@@ -236,4 +236,7 @@ class Node < ActiveRecord::Base
       :values => data['values']
     }
   end
+
+  def self.resource_status_totals(resource_status, scope='all')
+  end
 end

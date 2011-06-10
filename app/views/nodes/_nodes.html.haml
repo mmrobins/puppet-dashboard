@@ -29,6 +29,11 @@
         Unchanged
   %tbody
     - if nodes.present?
+      %tr
+        %td{:colspan => 3}  Total
+        - ["total", "failed", "pending", "changed", "unchanged"].each do |status|
+          - options = {:conditions => "metrics.category = 'resources' AND metrics.name = '#{status}'", :joins => 'left join metrics on metrics.report_id = nodes.last_apply_report_id'}
+          %td= ['all', 'index'].include?(selected_status) ? Node.sum(:value, options).to_i : Node.send(selected_status).sum(:value, options).to_i
       - nodes.each do |node|
         - sources = container.nodes_with_sources[node] unless container.nil?
         %tr[node]{:class => "#{'active' if node == @node}"}
